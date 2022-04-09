@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="GestPharmaEF.Patterns.Mvvm.Commands.Command" BaseTypeListCollapsed="true">
+    <Position X="7.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEACAAQAAECAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Pattern\MVVM\Commad\Command.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="GestPharmaEF.MainViewModel" BaseTypeListCollapsed="true">
+    <Position X="7.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModels\MainViewModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="GestPharmaEF.App">
+    <Position X="5.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>App.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GestPharmaEF.MainWindow" BaseTypeListCollapsed="true">
+    <Position X="5.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="GestPharmaEF.DAL.Config.ArmoireEntityConfig" Collapsed="true">
+    <Position X="16" Y="2" Width="2.75" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="GestPharmaEF.DAL.Config.ArmoiresStockEntityConfig" Collapsed="true">
+    <Position X="16" Y="6.5" Width="2.75" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="GestPharmaEF.DAL.Config.MedecinEntityConfig" Collapsed="true">
+    <Position X="16" Y="5.75" Width="2.75" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="GestPharmaEF.DAL.Config.MedicamentEntityConfig" Collapsed="true">
+    <Position X="16" Y="4.25" Width="2.75" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="GestPharmaEF.DAL.Config.MedicamentsPrescritEntityConfig" Collapsed="true">
+    <Position X="16" Y="5" Width="2.75" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="GestPharmaEF.DAL.Config.OrdonnanceEntityConfig" Collapsed="true">
+    <Position X="16" Y="3.5" Width="2.75" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="GestPharmaEF.DAL.Config.PharmacyEntityConfig" Collapsed="true">
+    <Position X="16" Y="2.75" Width="2.75" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="GestPharmaEF.DAL.Entities.ArmoireEntity" Collapsed="true">
+    <Position X="13.5" Y="2" Width="2.25" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="GestPharmaEF.DAL.Entities.ArmoiresStockEntity" Collapsed="true">
+    <Position X="13.5" Y="6.5" Width="2.25" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="GestPharmaEF.DAL.Entities.MedecinEntity" Collapsed="true">
+    <Position X="13.5" Y="5.75" Width="2.25" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="GestPharmaEF.DAL.Entities.MedicamentEntity" Collapsed="true">
+    <Position X="13.5" Y="4.25" Width="2.25" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="GestPharmaEF.DAL.Entities.OrdonnanceEntity" Collapsed="true">
+    <Position X="13.5" Y="3.5" Width="2.25" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="GestPharmaEF.DAL.MedicamentsPrescritEntity" Collapsed="true">
+    <Position X="13.5" Y="5" Width="2.25" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="GestPharmaEF.DAL.PharmacyEntity" Collapsed="true">
+    <Position X="13.5" Y="2.75" Width="2.25" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="GestPharmaEF.DAL.BDPMContext" Collapsed="true">
+    <Position X="15" Y="7.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="GestPharmaEF.DAL.Repositories.Abstracts.BaseRepository&lt;T&gt;" Collapsed="true">
+    <Position X="20.75" Y="0.5" Width="2.25" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GestPharmaEF.DAL.Repositories.Mappers.MedecinMappers">
+    <Position X="11.25" Y="4.25" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="GestPharmaEF.DAL.Repositories.MedecinRepository" Collapsed="true">
+    <Position X="19.25" Y="5.75" Width="2.25" />
+    <InheritanceLine Type="GestPharmaEF.DAL.Repositories.Abstracts.BaseRepository&lt;T&gt;" ManuallyRouted="true" FixedToPoint="true">
+      <Path>
+        <Point X="21.875" Y="1.062" />
+        <Point X="21.875" Y="1.572" />
+        <Point X="22.773" Y="1.572" />
+        <Point X="22.773" Y="6.062" />
+        <Point X="21.5" Y="6.062" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GestPharmaEF.Models.Abstracts.Adresse">
+    <Position X="9.25" Y="2" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="GestPharmaEF.Models.Concretes.Medecins" BaseTypeListCollapsed="true">
+    <Position X="9.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Interface Name="GestPharmaEF.DAL.Repositories.Interface.IMedecinRepository" Collapsed="true">
+    <Position X="23.25" Y="1.75" Width="2.25" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="GestPharmaEF.DAL.Repositories.Interface.IRepository&lt;T&gt;" Collapsed="true">
+    <Position X="23.25" Y="0.5" Width="2.25" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="GestPharmaEF.Models.Interfaces.IMedecins">
+    <Position X="9.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

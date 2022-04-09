@@ -1,0 +1,75 @@
+﻿<Window
+    x:Class="GestPharmaEF.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:GestPharmaEF"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="MainWindow"
+    mc:Ignorable="d">
+    <ScrollViewer Height="700">
+        <StackPanel x:Name="MedecinAfficher" Visibility="Visible">
+            <DataGrid
+                x:Name="ListMedecins"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                AllowDrop="False"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                CanUserResizeColumns="True"
+                SelectionMode="Single"
+                Visibility="Visible">
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        MinWidth="200"
+                        Binding="{Binding MedecinName}"
+                        CanUserResize="False"
+                        Header="Nom - prénom"
+                        IsReadOnly="True" />
+                    <DataGridTextColumn
+                        MinWidth="080"
+                        Binding="{Binding MedecinInami}"
+                        CanUserResize="False"
+                        Header="INAMI"
+                        IsReadOnly="True" />
+                    <DataGridTextColumn
+                        MinWidth="200"
+                        Binding="{Binding MedecinRue}"
+                        CanUserResize="False"
+                        Header="Rue"
+                        IsReadOnly="True" />
+                    <DataGridTextColumn
+                        MinWidth="200"
+                        Binding="{Binding MedecinVille}"
+                        CanUserResize="False"
+                        Header="Ville"
+                        IsReadOnly="True" />
+                    <DataGridTextColumn
+                        MinWidth="080"
+                        Binding="{Binding MedecinTelephone}"
+                        CanUserResize="False"
+                        Header="Téléphone"
+                        IsReadOnly="True" />
+                    <DataGridTextColumn
+                        MinWidth="080"
+                        Binding="{Binding MedecinGsm}"
+                        CanUserResize="False"
+                        Header="GSM"
+                        IsReadOnly="True" />
+                    <DataGridTextColumn
+                        MinWidth="080"
+                        Binding="{Binding MedecinFax}"
+                        CanUserResize="False"
+                        Header="Fax"
+                        IsReadOnly="True" />
+                    <DataGridTextColumn
+                        MinWidth="300"
+                        Binding="{Binding MedecinEmail}"
+                        CanUserResize="False"
+                        Header="Email"
+                        IsReadOnly="True" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </StackPanel>
+    </ScrollViewer>
+</Window>
