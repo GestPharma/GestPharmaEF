@@ -65,8 +65,7 @@ namespace GestPharmaEF.WebApi.Controllers
         }
 
         // PUT api/<MedecinsController>/update/5
-        [HttpPut]
-        [Route("update/{id}")]
+        [HttpPut("{id}", Name = "update")]
         [Authorize(Roles = "Admin, Praticien")]
         public void Put(long id, [FromBody] J_Medecins majMedecin)
         {
@@ -86,8 +85,7 @@ namespace GestPharmaEF.WebApi.Controllers
         }
 
         // DELETE api/<MedecinsController>/delete/5
-        [HttpDelete]
-        [Route("delete/{id}")]
+        [HttpDelete("{id}", Name = "delete")]
         [Authorize(Roles = "Admin, Praticien")]
         public void Delete(long id)
         {

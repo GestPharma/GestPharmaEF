@@ -1,7 +1,9 @@
 ﻿using GestPharmaEF.DAL.Entities;
+using Microsoft.AspNetCore.Identity;
+
 namespace GestPharmaEF.DAL.Entities
 {
-    public partial class PersonneEntity
+    public partial class PersonneEntity : IdentityUser<long>
     {
         public long? Id { get; set; }
         public string? Email { get; set; }

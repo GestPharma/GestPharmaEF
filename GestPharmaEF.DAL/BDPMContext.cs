@@ -1,13 +1,13 @@
 ﻿using GestPharmaEF.DAL.Config;
 using GestPharmaEF.DAL.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-
-using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GestPharmaEF.DAL
 {
-    public partial class BDPMContext : DbContext
+    public partial class BDPMContext : IdentityDbContext<PersonneEntity, RoleEntity, long>
     {
         public BDPMContext()
         {
@@ -34,6 +34,12 @@ namespace GestPharmaEF.DAL
             Pharmacies = Set<PharmacyEntity>();
             Personnes = Set<PersonneEntity>();
             Roles = Set<RoleEntity>();
+        }
+
+        public class Startup
+        {
+            public void ConfigureServices(IServiceCollection services)
+                => services.AddDbContext<BDPMContext>();
         }
 
         public virtual DbSet<ArmoireEntity> Armoires { get; set; }
