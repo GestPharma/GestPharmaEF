@@ -1,48 +1,50 @@
 ﻿using GestPharmaEF.DAL.Repositories;
 using GestPharmaEF.Models.Concretes;
-using GestPharmaEF.WebApi.JWT_Authentication.JWTWebAuthentication.Repository;
+using GestPharmaEF.WebApi.Filters;
 using GestPharmaEF.WebApi.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.ObjectModel;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace GestPharmaEF.WebApi.Controllers
 {
-    [Authorize]
+    [Authorization]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     public class PharmaciesController : ControllerBase
     {
-        private readonly IJWTManagerRepository _jWTManager;
+        private readonly PharmacieRepository _pharmacieRepository;
 
-        public PharmaciesController(IJWTManagerRepository jWTManager)
+        public PharmaciesController(PharmacieRepository pharmacieRepository)
         {
-            this._jWTManager = jWTManager;
+            _pharmacieRepository = pharmacieRepository;
         }
 
         // GET: api/<PharmaciesController>
         [HttpGet]
-        [Authorize(Roles = "Admin, Praticien, Patient")]
-        public IEnumerable<Pharmacies> Get()
+        [Authorization("Admin", "Praticien")]
+        public IEnumerable<Pharmacies> GetAll()
         {
-            PharmacieRepository pharmacieRepository = new();
-            return new ObservableCollection<Pharmacies>(pharmacieRepository.GetAll()).ToList();
+            return new ObservableCollection<Pharmacies>(_pharmacieRepository.GetAll()).ToList();
         }
-
+        // GET: api/<MedecinsController>
+        [HttpGet]
+        [Authorization("Admin", "Praticien", "Patient")]
+        public IEnumerable<Pharmacies> GetPage([FromQuery] int limit = 20, [FromQuery] int offset = 0)
+        {
+            return new ObservableCollection<Pharmacies>(_pharmacieRepository.GetAll(limit, offset)).ToList();
+        }
         // GET api/<PharmaciesController>/5
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin, Praticien")]
-        public Pharmacies Get(long id)
+        [Authorization("Admin", "Praticien", "Patient")]
+        public Pharmacies GetOne(long id)
         {
-            PharmacieRepository pharmacieRepository = new();
-            return pharmacieRepository.GetOne(id);
+            return _pharmacieRepository.GetOne(id);
         }
 
         // POST api/<PharmaciesController>
         [HttpPost]
-        [Authorize(Roles = "Admin, Praticien")]
+        [Authorization("Admin", "Praticien")]
         public void Post([FromBody] J_Pharmacies newPharmacie)
         {
             Pharmacies pharmacie = new(
@@ -53,15 +55,16 @@ namespace GestPharmaEF.WebApi.Controllers
                         newPharmacie.PharmacieVilles,
                         newPharmacie.PharmacieDepartement,
                         newPharmacie.PharmacieRegion
-                        );
-            pharmacie.PharmacieId = 0;
-            PharmacieRepository pharmacieRepository = new();
-            pharmacieRepository.Add(pharmacie);
+                        )
+            {
+                PharmacieId = 0
+            };
+            _pharmacieRepository.Add(pharmacie);
         }
 
         // PUT api/<PharmaciesController>/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin, Praticien")]
+        [Authorization("Admin", "Praticien")]
         public void Put(long id, [FromBody] J_Pharmacies majPharmacie)
         {
             Pharmacies pharmacie = new(
@@ -72,19 +75,19 @@ namespace GestPharmaEF.WebApi.Controllers
                         majPharmacie.PharmacieVilles,
                         majPharmacie.PharmacieDepartement,
                         majPharmacie.PharmacieRegion
-                        );
-            pharmacie.PharmacieId = id;
-            PharmacieRepository pharmacieRepository = new();
-            pharmacieRepository.Update(pharmacie);
+                        )
+            {
+                PharmacieId = id
+            };
+            _pharmacieRepository.Update(pharmacie);
         }
 
         // DELETE api/<PharmaciesController>/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin, Praticien")]
+        [Authorization("Admin", "Praticien")]
         public void Delete(long id)
         {
-            PharmacieRepository pharmacieRepository = new();
-            pharmacieRepository.Delete(id);
+            _pharmacieRepository.Delete(id);
         }
     }
 }

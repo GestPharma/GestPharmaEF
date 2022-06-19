@@ -9,9 +9,10 @@ namespace GestPharmaEF.DAL.Repositories
     {
     public class MedicamentRepository : BaseRepository<Medicaments>, IMedicamentsRepository
         {
-        public MedicamentRepository() : base()
-            {
-            }
+        public MedicamentRepository(BDPMContext context) : base(context)
+        {
+        }
+
         public override Medicaments GetOne(long id)
         {
             return _db.Medicaments.Find(id)!.ToModel();
@@ -24,7 +25,10 @@ namespace GestPharmaEF.DAL.Repositories
             {
             return _db.Medicaments.Select(m => m.ToModel());
             }
-
+        public IEnumerable<Medicaments> GetAll(int limit, int offset)
+        {
+            return _db.Medicaments.Skip(offset).Take(limit).Select(m => m.ToModel());
+        }
         public override bool Add(Medicaments Medicament)
             {
             MedicamentEntity toInsert = Medicament.ToEntity();
@@ -43,23 +47,23 @@ namespace GestPharmaEF.DAL.Repositories
             }
 
         public override bool Update(Medicaments Medicament)
-            {
-            // MedicamentEntity Me = _db.Medicaments.Find(Medicament.MedicamentId)!;
+        {
+            MedicamentEntity toUpdate = _db.Medicaments.Find(Medicament.MedicamentId)!;
+            toUpdate.Id = Medicament.MedicamentId;
+            _db.Medicaments.Remove(_db.Medicaments.Find(Medicament.MedicamentId)!);
+            toUpdate = Medicament.ToEntity();
+            _db.Medicaments.Add(toUpdate);
+
             try
-                {
-                MedicamentEntity Me = MedicamentMappers.ToEntity(Medicament);
-                if (_db.Entry<MedicamentEntity>(Me).State == EntityState.Detached)
-                    {
-                    _db.Entry<MedicamentEntity>(Me).State = EntityState.Modified;
-                    }
+            {
                 _db.SaveChanges();
                 return true;
-                }
-            catch (DbUpdateException)
-                {
-                return false;
-                }
             }
+            catch (DbUpdateException)
+            {
+                return false;
+            }
+        }
 
         public override bool Delete(long id)
             {

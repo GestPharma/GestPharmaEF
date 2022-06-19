@@ -20,43 +20,43 @@ namespace GestPharmaEF.DAL.Config
                     .HasComment("TRIAL");
 
                 builder.Property(e => e.Departement)
-                    .HasColumnType("text")
+                    .HasColumnType("nvarchar(256)")
                     .HasColumnName("departement")
                     .IsRequired()
                     .HasComment("TRIAL");
 
                 builder.Property(e => e.Nom)
-                    .HasColumnType("text")
+                    .HasColumnType("nvarchar(256)")
                     .HasColumnName("nom")
                     .IsRequired()
                     .HasComment("TRIAL");
 
                 builder.Property(e => e.Region)
-                    .HasColumnType("text")
+                    .HasColumnType("nvarchar(256)")
                     .HasColumnName("region")
                     .IsRequired()
                     .HasComment("TRIAL");
 
                 builder.Property(e => e.Rue)
-                    .HasColumnType("text")
+                    .HasColumnType("nvarchar(256)")
                     .HasColumnName("rue")
                     .IsRequired()
                     .HasComment("TRIAL");
 
                 builder.Property(e => e.Titulaires)
-                    .HasColumnType("text")
+                    .HasColumnType("nvarchar(256)")
                     .HasColumnName("titulaires")
                     .IsRequired()
                     .HasComment("TRIAL");
 
                 builder.Property(e => e.Url)
-                    .HasColumnType("text")
+                    .HasColumnType("nvarchar(256)")
                     .HasColumnName("url")
                     .IsRequired()
                     .HasComment("TRIAL");
 
                 builder.Property(e => e.Villes)
-                    .HasColumnType("text")
+                    .HasColumnType("nvarchar(256)")
                     .HasColumnName("villes")
                     .IsRequired()
                     .HasComment("TRIAL");

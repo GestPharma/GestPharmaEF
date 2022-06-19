@@ -7,9 +7,11 @@ namespace GestPharmaEF.DAL.Repositories.Mappers
         {
         public static Armoires ToModel(this ArmoireEntity Entity)
             {
-            Armoires Armoire = new(Entity.Id, Entity.Nom?? "", Entity.Patient?? "");
-            Armoire.ArmoID = Entity.Id;
-            Armoire.ArmoName = Entity.Nom??"";
+            Armoires Armoire = new(Entity.Id, Entity.Nom ?? "", Entity.Patientid)
+            {
+                ArmoID = Entity.Id,
+                ArmoName = Entity.Nom ?? ""
+            };
             return Armoire;
             }
 
@@ -19,7 +21,7 @@ namespace GestPharmaEF.DAL.Repositories.Mappers
                 {
                 Id = Model.ArmoID,
                 Nom = Model.ArmoName,
-                Patient = Model.ArmoPatient,
+                Patientid = Model.ArmoPatient,
                 };
             }
         }

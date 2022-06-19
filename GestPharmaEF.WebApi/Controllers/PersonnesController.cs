@@ -2,220 +2,335 @@
 using GestPharmaEF.Models.Concretes;
 using GestPharmaEF.WebApi.JWT_Authentication.JWTWebAuthentication.Repository;
 using GestPharmaEF.WebApi.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.ObjectModel;
-using System.Security.Claims;
-using System.Text;
-using System.Security.Cryptography;
+using Microsoft.AspNetCore.Identity;
+using GestPharmaEF.DAL.Entities;
+using GestPharmaEF.DAL;
+using GestPharmaEF.WebApi.Filters;
+using Microsoft.EntityFrameworkCore;
 
 namespace GestPharmaEF.WebApi.Controllers
 {
-    [Authorize]
+    [Authorization]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     public class PersonnesController : ControllerBase
     {
         private readonly IJWTManagerRepository _jWTManager;
-        private string _jWTEmail;
+        private readonly PersonneRepository _personneRepository;
+        private readonly SignInManager<PersonneEntity> _signInManager;
+        private readonly UserManager<PersonneEntity> _userManager;
+        private readonly RoleManager<RoleEntity> _roleManager;
+        private readonly ArmoireRepository _armoireRepository;
+        private readonly BDPMContext _context;
 
-        public PersonnesController(IJWTManagerRepository jWTManager)
+        public PersonnesController( IJWTManagerRepository jWTManager, 
+                                    PersonneRepository personneRepository, 
+                                    SignInManager<PersonneEntity> signInManager, 
+                                    UserManager<PersonneEntity> userManager, 
+                                    RoleManager<RoleEntity> roleManager,
+                                    BDPMContext context,
+                                    ArmoireRepository armoireRepository
+            )
         {
-            this._jWTManager = jWTManager;
+            _jWTManager = jWTManager;
+            _personneRepository = personneRepository;
+            _armoireRepository = armoireRepository;
+            _signInManager = signInManager;
+            _userManager = userManager;
+            _roleManager = roleManager;
+            _context = context;
         }
 
         // GET: api/<PersonnesController>
         [HttpGet]
-        [Authorize(Roles = "Admin")]
-        public IEnumerable<Personnes> GetAll()
+        [Authorization("Admin", "Praticien")]
+        public IEnumerable<PersonneEntity> GetAll()
         {
-            PersonneRepository personneRepository = new();
-            return new ObservableCollection<Personnes>(personneRepository.GetAll()).ToList();
+            return _context.Users.Include(x => x.Roles).ToList() ;
         }
 
-        // GET: api/<PersonnesController>
-        [HttpGet("{connectAs}")]
-        [Authorize(Roles = "Admin, Praticien")]
-        public IEnumerable<Personnes> GetAllPatients(string connectAs)
+        [HttpGet]
+        [Authorization("Admin", "Praticien")]
+        public IEnumerable<PersonneEntity> GetAllAs([FromQuery] string connectAs)
         {
-            PersonneRepository personneRepository = new();
-            return new ObservableCollection<Personnes>(personneRepository.GetAll()).ToList().Where(x => x.connectas == connectAs);
+            return new ObservableCollection<PersonneEntity>(_context.Users.Include(x => x.Roles).ToList())
+                .Where(x => x.ConnectAs == connectAs && x.IsActive == true);
         }
 
         // GET api/<PersonnesController>/5
-        [HttpGet("{id}")]
-        [Authorize(Roles = "Admin")]
-        public Personnes GetOne(long id)
+        [HttpGet]
+        [Authorization("Admin", "Praticien")]
+        public IEnumerable<Personnes>? GetOne([FromQuery] long id)
         {
-            PersonneRepository personneRepository = new();
-            return personneRepository.GetOne(id);
+            IEnumerable<Personnes> aa = _personneRepository.GetOne2(id);
+            if (aa != null) {
+                foreach (var item in aa) { _ = item; };
+                return aa.AsEnumerable();
+            }
+            return null;
         }
 
-        [HttpGet("{id} {connectAs}")]
-        [Authorize(Roles = "Admin, Praticien")]
-        public Personnes GetOnePatient(long id, string connectAs)
+        [HttpGet]
+        [Authorization("Admin", "Praticien")]
+        public Personnes? GetOneAs([FromQuery] long id, [FromQuery] string connectAs)
         {
-            PersonneRepository personneRepository = new();
-            Personnes ar = personneRepository.GetOne(id);
-            if (ar.connectas != connectAs) return null;
-            return personneRepository.GetOne(id);
+            Personnes ar = _personneRepository.GetOne(id);
+            if (ar != null) {
+                if (ar.Connectas != connectAs) return null;
+                if (ar.Isactive != true) return null;
+                return _personneRepository.GetOne(id);
+            }
+            return null;
         }
 
         // POST api/<PersonnesController>
         [HttpPost]
-        [Authorize(Roles = "Admin")]
-        public void Post([FromBody] J_Personnes newPersonne)
+        [Authorization("Admin", "Praticien")]
+        public async Task<IActionResult> Post([FromQuery] J_Personnes newPersonne)
         {
-            Personnes personne= new(
-                        newPersonne.email,
-                        EncriptaPassWord(newPersonne.paswword),
-                        newPersonne.isactive,
-                        newPersonne.currentrole
-                        );
-            personne.Id = 0;
-            personne.connectas = newPersonne.connectAs;
-            PersonneRepository personneRepository = new();
-            personneRepository.Add(personne);
+            PersonneEntity user = new();
+            var result = await _signInManager.CheckPasswordSignInAsync(user, newPersonne.Paswword, false);
+            if (result.Succeeded)
+            {
+                user.ConnectAs = newPersonne.ConnectAs;
+                user.IsActive = newPersonne.Isactive;
+                user.CurrentRoleId = newPersonne.Currentrole;
+                user.Email = newPersonne.Email;
+                user.UserName = newPersonne.Email;
+                user.EmailConfirmed = true;
+                user.SecurityStamp = (DateTime.Now - new DateTime(1970, 1, 1)).TotalSeconds.ToString();
+            }
+            try
+            {
+                _context.Personnes.Add(user);
+                _context.SaveChanges();
+                return Ok();
+            }
+            catch (Exception)
+            {
+                _context.Personnes.Remove(user);
+                return BadRequest();
+            }
         }
         // PUT api/<PersonnesController>/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
-        public void Put(long id, [FromBody] J_Personnes majPersonne)
+        [Authorization("Admin", "Praticien")]
+        public async Task<IActionResult> Put(long id, [FromBody] J_Personnes majPersonne)
         {
-            Personnes personne = new(
-                        majPersonne.email,
-                        EncriptaPassWord(majPersonne.paswword),
-                        majPersonne.isactive,
-                        majPersonne.currentrole
-                        );
-            personne.Id = id;
-            personne.connectas = majPersonne.connectAs;
-            PersonneRepository personneRepository = new();
-            personneRepository.Update(personne);
+            PersonneEntity user = await _userManager.FindByIdAsync(id.ToString());
+            var result = await _signInManager.CheckPasswordSignInAsync(user, majPersonne.Paswword, false);
+            if (result.Succeeded)
+            {
+                user.ConnectAs = majPersonne.ConnectAs;
+                user.IsActive = majPersonne.Isactive;
+                user.CurrentRoleId = majPersonne.Currentrole;
+                user.Email = majPersonne.Email;
+                user.UserName = majPersonne.Email;
+                user.EmailConfirmed = true;
+                user.SecurityStamp = (DateTime.Now - new DateTime(1970, 1, 1)).TotalSeconds.ToString();
+            }
+            try
+            {
+                _context.SaveChanges();
+                return Ok();
+            }
+            catch (Exception)
+            {
+                _context.Personnes.Remove(user);
+                return BadRequest();
+            }
         }
 
         // DELETE api/<PersonnesController>/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
-        public void Delete(long id)
+        [Authorization("Admin", "Praticien")]
+        public async Task<IActionResult> Delete(long id)
         {
-            PersonneRepository personneRepository = new();
-            personneRepository.Delete(id);
-        }
-
-        //POST api/<PersonnesController>
-        [HttpPost]
-        [AllowAnonymous]
-        [Route("Login")]
-        public IActionResult Login(string email, string password)
-        {
-            Personnes personne = new(
-                        email,
-                        EncriptaPassWord(password),
-                        false,
-                        2
-                        );
-            personne.Id = 0;
-            PersonneRepository personneRepository = new();
-            //StringSha256Hash (string text) => string.IsNullOrEmpty(text) ? string.Empty : BitConverter.ToString(new System.Security.Cryptography.SHA256Managed().ComputeHash(System.Text.Encoding.UTF8.GetBytes(text))).Replace("-", string.Empty);
-            if (!personneRepository.GetUser(email, EncriptaPassWord(password))) return BadRequest();
-            else 
-            {
-                J_Users BigUsers = new();
-                BigUsers.email = email;
-                BigUsers.paswword = EncriptaPassWord(password);
-                var token = _jWTManager.Authenticate(BigUsers);
-                if (token == null)
-                {
-                    return Unauthorized();
-                }
-                return Ok(token);
-            }
-        }
-
-        //POST api/<PersonnesController>
-        [HttpPost]
-        [AllowAnonymous]
-        [Route("Register")]
-        public IActionResult Register(string email, string password)
-        {
-            PersonneRepository personneRepository = new();
-            if (!personneRepository.GetUser(email, password))
-            {
-                Personnes personne = new(
-                            email,
-                            EncriptaPassWord(password),
-                            false,
-                            2
-                            );
-                personne.Id = 0;
-                personne.connectas = email;
-                personneRepository.Add(personne);
-                J_Users BigUsers = new();
-                BigUsers.email = email;
-                BigUsers.paswword = EncriptaPassWord(password);
-                var token = _jWTManager.Authenticate(BigUsers);
-                if (token == null)
-                {
-                    return Unauthorized();
-                }
-                return Ok(token);
-            }
-            else
-            {
-                return BadRequest();
-            }
-        }
-        //POST api/<PersonnesController>
-        [HttpPost]
-        [Authorize(Roles = "Admin, Praticien")]
-        [Route("Create")]
-        public IActionResult Create(string email, string password)
-        {
-            PersonneRepository personneRepository = new();
-            if (personneRepository.GetUser(email, password))
-            {
-                Personnes personne = new(
-                            email,
-                            EncriptaPassWord(password),
-                            false,
-                            2
-                            );
-                personne.Id = 0;
-                personne.connectas = _jWTEmail;
-                personneRepository.Add(personne);
-                J_Users BigUsers = new();
-                BigUsers.email = email;
-                BigUsers.paswword = EncriptaPassWord(password);
-                var token = _jWTManager.Authenticate(BigUsers);
-                if (token == null)
-                {
-                    return Unauthorized();
-                }
-                return Ok(token);
-            }
-            else
-            {
-                return BadRequest();
-            }
-        }
-
-        public static string EncriptaPassWord(string Password)
-        {
+            PersonneEntity user = await _userManager.FindByIdAsync(id.ToString());
+            user.IsActive = false;
             try
             {
-                SHA256Managed hasher = new SHA256Managed();
-
-                byte[] pwdBytes = new UTF8Encoding().GetBytes(Password);
-                byte[] keyBytes = hasher.ComputeHash(pwdBytes);
-
-                hasher.Dispose();
-                return Convert.ToBase64String(keyBytes);
+                _context.SaveChanges();
+                return Ok();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception(ex.Message, ex);
+                _context.Personnes.Remove(user);
+                return BadRequest();
             }
         }
+
+        // Login ouvert à tout le monde
+        [HttpPost]
+        public async Task<IActionResult> Login(string email, string password)
+        {
+            PersonneEntity p = await _userManager.FindByNameAsync(email);
+            if (p != null)
+            {
+                if (p.IsActive == true)
+                {
+                    var ar = _armoireRepository.GetAll();
+                    if (!ar.Any(x => x.ArmoPatient == p.Id && x.ArmoName == email.ToUpper() + " : Pilulier"))
+                    {
+                        Armoires pilulier = new(0, email.ToUpper() + " : Pilulier", p.Id);
+                        _armoireRepository.Add(pilulier);
+                    }
+                    if (!ar.Any(x => x.ArmoPatient == p.Id && x.ArmoName == email.ToUpper() + " : Armoire"))
+                    {
+                        Armoires armoire = new(0, email.ToUpper() + " : Armoire", p.Id);
+                        _armoireRepository.Add(armoire);
+                    }
+                    var result = await _signInManager.CheckPasswordSignInAsync(p, password, false);
+                    if (result.Succeeded)
+                    {
+                        J_Users BigUsers = new()
+                        {
+                            Email = email
+                        };
+                        RoleEntity q = await _roleManager.FindByIdAsync(p.CurrentRoleId.ToString());
+                        BigUsers.Role = q.Name;
+
+                        var token = _jWTManager.Authenticate(BigUsers);
+                        if (token == null)
+                        {
+                            return Unauthorized();
+                        }
+                        return Ok(token);
+                    }
+                    else
+                    {
+                        return Unauthorized();
+                    }
+                }
+                else
+                {
+                    return Unauthorized();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        // tous les patients ont connectAs = email par defaut => n'ont pas praticien : Ouvert a tout le monde
+        [HttpPost]
+        public async Task<IActionResult> RegisterPatient(string email, string password)
+        {
+            PersonneEntity p = await _userManager.FindByNameAsync(email);
+            if (p == null)
+            {
+                PersonneEntity user = new()
+                {
+                    Email = email,
+                    CurrentRoleId = 2,
+                    UserName = email,
+                    ConnectAs = email,
+                    IsActive = false,
+                    EmailConfirmed = true,
+                    SecurityStamp = (DateTime.Now - new DateTime(1970, 1, 1)).TotalSeconds.ToString()
+                };
+                var result = await _userManager.CreateAsync(user, password);
+                try
+                {
+                    _context.SaveChanges();
+                    PersonneEntity r = await _userManager.FindByNameAsync(email);
+                    Armoires pilulier = new(0, email.ToUpper() + " : Pilulier", r.Id);
+                    _armoireRepository.Add(pilulier);
+                    Armoires armoire = new(0, email.ToUpper()+" : Armoire", r.Id);
+                    _armoireRepository.Add(armoire);
+                    return Ok();
+                }
+                catch (Exception)
+                {
+                    _context.Personnes.Remove(user);
+                    return BadRequest(result.Errors);
+                }
+            }
+            else {
+                return BadRequest();
+            }
+        }
+
+        [HttpPost]
+        [Authorization("Admin")]
+        // C'est l'admin qui peut enregistrer un praticien
+        public async Task<IActionResult> RegisterPraticien(string emailPraticien, string passwordPraticien)
+        {
+            PersonneEntity p = await _userManager.FindByNameAsync(emailPraticien);
+            if (p == null)
+            {
+                    PersonneEntity user = new()
+                    {
+                        Email = emailPraticien,
+                        CurrentRoleId = 3,
+                        UserName = emailPraticien,
+                        ConnectAs = emailPraticien,
+                        IsActive = true,
+                        EmailConfirmed = true,
+                        SecurityStamp = (DateTime.Now - new DateTime(1970, 1, 1)).TotalSeconds.ToString()
+                    };
+                _ = await _userManager.CreateAsync(user, passwordPraticien);
+                try
+                    {
+                        _context.SaveChanges();
+                        return Ok();
+                    }
+                    catch (Exception)
+                    {
+                        _context.Personnes.Remove(user);
+                        return BadRequest();
+                    }
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPost]
+        [Authorization("Admin", "Praticien")]
+        // le patient prend dans connectas l'émail du praticien => vérification ligin du praticien
+        public async Task<IActionResult> RegisterPatientToPraticien(string praticienEmail, string praticienPassword, string patientEmail)
+        {
+            PersonneEntity p = await _userManager.FindByNameAsync(patientEmail);
+            if (p != null)
+            {
+                PersonneEntity q = await _userManager.FindByNameAsync(praticienEmail);
+                if (q != null)
+                {
+                    var result = await _signInManager.CheckPasswordSignInAsync(p, praticienPassword, false);
+                    if (result.Succeeded)
+                    {
+                        p.ConnectAs = praticienEmail;
+                        p.IsActive = true;
+                        try
+                        {
+                            _context.SaveChanges();
+                            return Ok();
+                        }
+                        catch (Exception)
+                        {
+                            _context.Personnes.Remove(p);
+                            return BadRequest();
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest();
+                    }
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }        
     }
 }

@@ -1,49 +1,52 @@
 ﻿using GestPharmaEF.DAL.Repositories;
 using GestPharmaEF.Models.Concretes;
-using GestPharmaEF.WebApi.JWT_Authentication.JWTWebAuthentication.Repository;
+using GestPharmaEF.WebApi.Filters;
 using GestPharmaEF.WebApi.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.ObjectModel;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace GestPharmaEF.WebApi.Controllers
 {
-    [Authorize]
+    [Authorization]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     public class ArmoiresContenuController : ControllerBase
     {
-        private readonly IJWTManagerRepository _jWTManager;
+        private readonly ArmoiresContenuRepository _armoiresContenuRepository;
 
-        public ArmoiresContenuController(IJWTManagerRepository jWTManager)
+        public ArmoiresContenuController(ArmoiresContenuRepository armoiresContenuRepository)
         {
-            this._jWTManager = jWTManager;
+           _armoiresContenuRepository = armoiresContenuRepository;
         }
 
         // GET: api/<ArmoiresContenuController>
         [HttpGet]
-        [Authorize(Roles = "Admin, Praticien, Patient")]
-        public IEnumerable<ArmoiresContenu> Get()
+        [Authorization("Admin", "Praticien", "Patient")]
+        public IEnumerable<ArmoiresContenu> GetAll()
         {
-            ArmoiresContenuRepository armoiresContenuRepository = new();
-            return new ObservableCollection<ArmoiresContenu>(armoiresContenuRepository.GetAll()).ToList();
+            return new ObservableCollection<ArmoiresContenu>(_armoiresContenuRepository.GetAll()).ToList();
         }
-
+        // GET: api/<MedecinsController>
+        [HttpGet]
+        [Authorization("Admin", "Praticien", "Patient")]
+        public IEnumerable<ArmoiresContenu> GetPage([FromQuery] int limit = 20, [FromQuery] int offset = 0)
+        {
+            return new ObservableCollection<ArmoiresContenu>(_armoiresContenuRepository.GetAll(limit, offset)).ToList();
+        }
         // GET api/<ArmoiresContenuController>/5
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin, Praticien")]
-        public ArmoiresContenu Get(long id)
+        [Authorization("Admin", "Praticien", "Patient")]
+        public IEnumerable<ArmoiresContenu> GetOne(long id)
         {
-            ArmoiresContenuRepository armoiresContenuRepository = new();
-            return armoiresContenuRepository.GetOne(id);
+            IEnumerable<ArmoiresContenu> aa = _armoiresContenuRepository.GetOne2(id);
+            foreach (var item in aa) { _ = item; };
+            return aa.AsEnumerable();
         }
 
         // POST api/<ArmoiresContenuController>
         [HttpPost]
-        [Authorize(Roles = "Admin, Praticien")]
-        public void Post([FromBody] J_ArmoiresContenu newArmoiresContenu)
+        [Authorization("Admin", "Praticien")]
+        public void Post([FromQuery] J_ArmoiresContenu newArmoiresContenu)
         {
             ArmoiresContenu armoiresContenu = new(
                         newArmoiresContenu.ACmedicamentId,
@@ -53,14 +56,13 @@ namespace GestPharmaEF.WebApi.Controllers
                         newArmoiresContenu.ACmediId
                         );
             newArmoiresContenu.ACarmoireId = 0;
-            ArmoiresContenuRepository armoiresContenuRepository = new();
-            armoiresContenuRepository.Add(armoiresContenu);
+            _armoiresContenuRepository.Add(armoiresContenu);
         }
 
         // PUT api/<ArmoiresContenuController>/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin, Praticien")]
-        public void Put(long id, [FromBody] J_ArmoiresContenu majArmoiresContenu)
+        [Authorization("Admin", "Praticien")]
+        public void Put(long id, [FromQuery] J_ArmoiresContenu majArmoiresContenu)
         {
             ArmoiresContenu armoiresContenu = new(
                         majArmoiresContenu.ACmedicamentId,
@@ -70,17 +72,15 @@ namespace GestPharmaEF.WebApi.Controllers
                         majArmoiresContenu.ACmediId
                         );
             majArmoiresContenu.ACarmoireId = id;
-            ArmoiresContenuRepository armoiresContenuRepository = new();
-            armoiresContenuRepository.Update(armoiresContenu);
+            _armoiresContenuRepository.Update(armoiresContenu);
         }
 
         // DELETE api/<ArmoiresContenuController>/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin, Praticien")]
+        [Authorization("Admin", "Praticien")]
         public void Delete(long id)
         {
-            ArmoiresContenuRepository armoiresContenuRepository = new();
-            armoiresContenuRepository.Delete(id);
+            _armoiresContenuRepository.Delete(id);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using EFCore_DBLibrary;
+using GestPharmaEF.DAL;
 
 namespace EFCore_FirstReverse
     {
@@ -12,6 +12,7 @@ namespace EFCore_FirstReverse
 
         static void Main(string[] args)
             {
+            _ = args;
             BuildConfiguration();
             Console.WriteLine($"CNSTR: {_configuration.GetConnectionString("GestPharmaWorks")}");
             BuildOptions();
@@ -33,25 +34,21 @@ namespace EFCore_FirstReverse
             }
         static void ListMedicaments()
             {
-            using (BDPMContext? db = new(_optionsBuilder.Options))
-                {
-                var medicaments = db.Medicaments.ToList();
-                foreach (var medoc in medicaments)
-                    {
-                    Console.WriteLine($"{medoc.Nom}");
-                    }
-                }
+            using BDPMContext? db = new(_optionsBuilder.Options);
+            var medicaments = db.Medicaments.ToList();
+            foreach (var medoc in medicaments)
+            {
+                Console.WriteLine($"{medoc.Nom}");
             }
+        }
         static void ListMedecins()
             {
-            using (BDPMContext? db = new(_optionsBuilder.Options))
-                {
-                var toubibs = db.Medecins.ToList();
-                foreach (var toubib in toubibs)
-                    {
-                    Console.WriteLine($"{toubib.Nom} {toubib.Ville}");
-                    }
-                }
+            using BDPMContext? db = new(_optionsBuilder.Options);
+            var toubibs = db.Medecins.ToList();
+            foreach (var toubib in toubibs)
+            {
+                Console.WriteLine($"{toubib.Nom} {toubib.Ville}");
             }
+        }
         }
     }

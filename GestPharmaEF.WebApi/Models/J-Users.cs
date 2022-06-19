@@ -3,7 +3,7 @@ namespace GestPharmaEF.WebApi.Models
 {
     public class J_Users
     {
-        public string email { get; set; }
-        public string paswword { get; set; }
+        public string? Email { get; set; }
+        public string? Role { get; set; }
     }
 }

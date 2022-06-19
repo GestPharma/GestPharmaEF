@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace GestPharmaEF.DAL.Entities
     {
@@ -20,8 +21,11 @@ namespace GestPharmaEF.DAL.Entities
         /// <summary>
         /// TRIAL
         /// </summary>
-        public string Patient { get; set; } = string.Empty;
+        public long Patientid { get; set; } = long.MinValue;
 
         public virtual ICollection<ArmoiresStockEntity>? ArmoiresStocks { get; set; }
-        }
+
+        public virtual PersonneEntity? Patient { get; set; }
+
+    }
 }

@@ -1,80 +1,85 @@
 ﻿using GestPharmaEF.DAL.Repositories;
 using GestPharmaEF.Models.Concretes;
-using GestPharmaEF.WebApi.JWT_Authentication.JWTWebAuthentication.Repository;
+using GestPharmaEF.WebApi.Filters;
 using GestPharmaEF.WebApi.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.ObjectModel;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace GestPharmaEF.WebApi.Controllers
 {
-    [Authorize]
+    [Authorization]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     public class MedicamentsController : ControllerBase
     {
-        private readonly IJWTManagerRepository _jWTManager;
+        private readonly MedicamentRepository _medicamentRepository;
 
-        public MedicamentsController(IJWTManagerRepository jWTManager)
+        public MedicamentsController(MedicamentRepository medicamentRepository)
         {
-            this._jWTManager = jWTManager;
+            _medicamentRepository = medicamentRepository;
         }
 
+        [HttpGet]
+        [Authorization("Admin", "Praticien", "Patient")]
+        public IEnumerable<Medicaments> GetAll()
+        {
+            return new ObservableCollection<Medicaments>(_medicamentRepository.GetAll()).ToList();
+        }
         // GET: api/<MedicamentsController>
         [HttpGet]
-        [Authorize(Roles = "Admin, Praticien, Patient")]
-        public IEnumerable<Medicaments> Get()
+        [Authorization("Admin", "Praticien", "Patient")]
+        public IEnumerable<Medicaments> GetPage([FromQuery] int limit = 20, [FromQuery] int offset = 0)
         {
-            MedicamentRepository medicamentRepository = new();
-            return new ObservableCollection<Medicaments>(medicamentRepository.GetAll()).ToList();
+            return new ObservableCollection<Medicaments>(_medicamentRepository.GetAll(limit, offset)).ToList();
         }
 
         // GET api/<MedicamentsController>/5
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin, Praticien")]
-        public Medicaments Get(long id)
+        [Authorization("Admin", "Praticien", "Patient")]
+        public IEnumerable<Medicaments> GetOne(long id)
         {
-            MedicamentRepository medicamentRepository = new();
-            return medicamentRepository.GetOne(id);
+            IEnumerable<Medicaments> aa = _medicamentRepository.GetOne2(id);
+            foreach (var item in aa) { _ = item; };
+            return aa.AsEnumerable();
+
         }
 
         // POST api/<MedicamentsController>
         [HttpPost]
-        [Authorize(Roles = "Admin, Praticien")]
-        public void Post([FromBody] J_Medicaments newMedicament)
+        [Authorization("Admin", "Praticien")]
+        public void Post([FromQuery] J_Medicaments newMedicament)
         {
             Medicaments medicament = new(
                         newMedicament.MedicamentId,
                         newMedicament.MedicamentNom
-                        );
-            medicament.MedicamentId = 0;
-            MedicamentRepository medicamentRepository = new();
-            medicamentRepository.Add(medicament);
+                        )
+            {
+                MedicamentId = 0
+            };
+            _medicamentRepository.Add(medicament);
         }
 
         // PUT api/<MedicamentsController>/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin, Praticien")]
-        public void Put(long id, [FromBody] J_Medicaments majMedicament)
+        [Authorization("Admin", "Praticien")]
+        public void Put(long id, [FromQuery] J_Medicaments majMedicament)
         {
             Medicaments medicament = new(
                             majMedicament.MedicamentId,
                             majMedicament.MedicamentNom
-                            );
-            medicament.MedicamentId = id;
-            MedicamentRepository medicamentRepository = new();
-            medicamentRepository.Update(medicament);
+                            )
+            {
+                MedicamentId = id
+            };
+            _medicamentRepository.Update(medicament);
         }
 
         // DELETE api/<MedicamentsController>/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin, Praticien")]
+        [Authorization("Admin", "Praticien")]
         public void Delete(long id)
         {
-            MedicamentRepository medicamentRepository = new();
-            medicamentRepository.Delete(id);
+            _medicamentRepository.Delete(id);
         }
     }
 }

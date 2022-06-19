@@ -7,9 +7,11 @@ namespace GestPharmaEF.DAL.Repositories.Mappers
     {
         public static Roles ToModel(this RoleEntity Entity)
         {
-            Roles Role = new(Entity.Name);
-            Role.Id = Entity.Id;
-            Role.Name = Entity.Name ?? "";
+            Roles Role = new(Entity.Name)
+            {
+                Id = Entity.Id,
+                Name = Entity.Name ?? ""
+            };
             return Role;
         }
 

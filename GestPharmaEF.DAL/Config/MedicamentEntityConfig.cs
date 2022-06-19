@@ -20,7 +20,7 @@ namespace GestPharmaEF.DAL.Config
                     .HasComment("TRIAL");
 
                 builder.Property(e => e.Nom)
-                    .HasColumnType("text")
+                    .HasColumnType("nvarchar(256)")
                     .HasColumnName("nom")
                     .IsRequired()
                     .HasComment("TRIAL");

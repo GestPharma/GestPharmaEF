@@ -10,5 +10,6 @@ namespace GestPharmaEF.WebApi.Models
         public DateTime OrdonnanceDate_expire { get; set; } = DateTime.MinValue;
         public long OrdonnanceMedecinid { get; set; } = long.MinValue;
         public long OrdonnancePharmacieid { get; set; } = long.MinValue;
+        public long OrdonnancePatient { get; set; } = long.MinValue;
     }
 }

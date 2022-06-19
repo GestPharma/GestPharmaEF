@@ -9,6 +9,10 @@ namespace GestPharmaEF.DAL.Repositories
 {
     public class MedecinRepository : BaseRepository<Medecins>, IMedecinRepository
     {
+        public MedecinRepository(BDPMContext context) : base(context)
+        {
+        }
+
         public override Medecins GetOne(long id)
         {
             return _db.Medecins.Find(id)!.ToModel();
@@ -17,6 +21,11 @@ namespace GestPharmaEF.DAL.Repositories
         {
             yield return _db.Medecins.Find(id)!.ToModel();
         }
+        public IEnumerable<Medecins> GetAll(int limit, int offset)
+        {
+            return _db.Medecins.Skip(offset).Take(limit).Select(m => m.ToModel());
+        }
+
         public override IEnumerable<Medecins> GetAll()
         {
             return _db.Medecins.Select(m => m.ToModel());
@@ -41,14 +50,14 @@ namespace GestPharmaEF.DAL.Repositories
 
         public override bool Update(Medecins Medecin)
         {
-            // MedecinEntity Me = _db.Medecins.Find(Medecin.MedecinId)!;
+            MedecinEntity toUpdate = _db.Medecins.Find(Medecin.MedecinId)!;
+            toUpdate.IdMedecin = Medecin.MedecinId;
+            _db.Medecins.Remove(_db.Medecins.Find(Medecin.MedecinId)!);
+            toUpdate = Medecin.ToEntity();
+            _db.Medecins.Add(toUpdate);
+
             try
             {
-                MedecinEntity Me = MedecinMappers.ToEntity(Medecin);
-                if ( _db.Entry<MedecinEntity>(Me).State == EntityState.Detached)
-                {
-                    _db.Entry<MedecinEntity>(Me).State = EntityState.Modified;
-                }
                 _db.SaveChanges();
                 return true;
             }

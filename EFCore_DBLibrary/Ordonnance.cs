@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GestPharmaEF.Models.Concretes;
+using System;
 using System.Collections.Generic;
 
 namespace EFCore_DBLibrary
@@ -20,7 +21,7 @@ namespace EFCore_DBLibrary
         /// <summary>
         /// TRIAL
         /// </summary>
-        public string Nom { get; set; }
+        public string Codebarre { get; set; }
         /// <summary>
         /// TRIAL
         /// </summary>
@@ -38,8 +39,12 @@ namespace EFCore_DBLibrary
         /// </summary>
         public long? Pharmacieid { get; set; }
 
+        public long? Patientid { get; set; }
+
         public virtual Medecin Medecin { get; set; }
         public virtual Pharmacy Pharmacie { get; set; }
         public virtual ICollection<ArmoiresStock> ArmoiresStocks { get; set; }
+
+        public virtual Personnes Patient { get; set; }
     }
 }

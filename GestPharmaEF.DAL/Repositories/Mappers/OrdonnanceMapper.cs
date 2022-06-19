@@ -8,11 +8,13 @@ namespace GestPharmaEF.DAL.Repositories.Mappers
         public static Ordonnances ToModel(this OrdonnanceEntity Entity)
             {
             Ordonnances Ordonnance = new(Entity.Id,
-                                    Entity.Nom ?? "",
+                                    Entity.Codebarre ?? "",
                                     Entity.Datecree,
                                     Entity.Dateexpire,
                                     Entity.Medecinid,
-                                    Entity.Pharmacieid);
+                                    Entity.Pharmacieid,
+                                    Entity.Patientid)
+                                    ;
             return Ordonnance;
             }
 
@@ -21,11 +23,12 @@ namespace GestPharmaEF.DAL.Repositories.Mappers
             return new OrdonnanceEntity()
                 {
                 Id = Model.OrdonnanceId,
-                Nom = Model.OrdonnanceCode_barre,
+                Codebarre = Model.OrdonnanceCode_barre,
                 Datecree = Model.OrdonnanceDate_creer,
                 Dateexpire = Model.OrdonnanceDate_expire,
                 Medecinid = Model.OrdonnanceMedecinid,
                 Pharmacieid = Model.OrdonnancePharmacieid,
+                Patientid = Model.OrdonnancePatient
                 };
             }
         }

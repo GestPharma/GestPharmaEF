@@ -13,8 +13,10 @@ namespace GestPharmaEF.DAL.Repositories.Mappers
                                     Entity.Titulaires ?? "",
                                     Entity.Region ?? "",
                                     Entity.Url ?? "",
-                                    Entity.Villes ?? "");
-            Pharmacie.PharmacieId = Entity.Id;
+                                    Entity.Villes ?? "")
+            {
+                PharmacieId = Entity.Id
+            };
             return Pharmacie;
             }
 

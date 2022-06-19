@@ -6,7 +6,7 @@ namespace GestPharmaEF.Models.Concretes
     /// </summary>
     public class Ordonnances : IOrdonnances
         {
-        public Ordonnances(long Id, string Code_barre, DateTime Date_creer, DateTime Date_expire, long Medecinid, long Pharmacieid)
+        public Ordonnances(long Id, string Code_barre, DateTime Date_creer, DateTime Date_expire, long Medecinid, long Pharmacieid, long Patient)
             {
             OrdonnanceId = Id;
             OrdonnanceCode_barre = Code_barre;
@@ -14,6 +14,7 @@ namespace GestPharmaEF.Models.Concretes
             OrdonnanceDate_expire = Date_expire;
             OrdonnanceMedecinid = Medecinid;
             OrdonnancePharmacieid = Pharmacieid;
+            OrdonnancePatient = Patient;
             }
         #region Fields
         public long OrdonnanceId { get; set; } = long.MinValue;
@@ -22,7 +23,8 @@ namespace GestPharmaEF.Models.Concretes
         public DateTime OrdonnanceDate_expire { get; set; } = DateTime.MinValue;
         public long OrdonnanceMedecinid { get; set; } = long.MinValue;
         public long OrdonnancePharmacieid{ get; set; } = long.MinValue;
+        public long OrdonnancePatient { get; set; } = long.MinValue;
 
         #endregion // Fields
-        }
+    }
     }

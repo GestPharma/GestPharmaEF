@@ -1,35 +1,13 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using GestPharmaEF.WebApi.JWT_Authentication.JWTWebAuthentication.Repository;
 using GestPharmaEF.WebApi.JWT_Authentication;
-using GestPharmaEF.DAL.Entities;
 using GestPharmaEF.DAL;
 using Microsoft.EntityFrameworkCore;
+using GestPharmaEF.DAL.Repositories;
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Identity;
+using GestPharmaEF.DAL.Entities;
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-
-
-builder.Services.AddDbContext<BDPMContext>(
-	
-	o => 
-		o.UseSqlServer(builder.Configuration.GetConnectionString("GestPharmaWorks"))
-	);
-
-
-builder.Services.AddIdentity<PersonneEntity, RoleEntity>(
-
-	o =>
-	{
-		o.SignIn.RequireConfirmedAccount = false;
-		o.Password.RequireDigit = true;
-		o.Password.RequireLowercase = true;
-		o.Password.RequireNonAlphanumeric = true;
-		o.Password.RequireUppercase = true;
-		o.Password.RequiredLength = 5;
-		o.Password.RequiredUniqueChars = 1;
-	})
-	.AddEntityFrameworkStores<BDPMContext>();
+var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(
 	o=>{
@@ -39,40 +17,60 @@ builder.Services.AddCors(
 										  });
 	});
 
-builder.Services.AddAuthentication(x =>
-{
-	x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-	x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(o =>
-{
-	// var Key = Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]);
-	byte[] macle = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SECRETJWT_GestPharmaEF", EnvironmentVariableTarget.Machine));
-	o.SaveToken = true;
-	o.TokenValidationParameters = new TokenValidationParameters
-	{
-		ValidateIssuer = true,										// qui m'a donner le token
-		ValidateAudience = true,									// pourquoi j'en ai besoin (domaine cad les API a joindre)
-		ValidateLifetime = true,									// durée
-		ValidateIssuerSigningKey = true,
-		ValidIssuer = builder.Configuration["JWT:Issuer"],			// Ici on va chercher Issuer et Audience dans l'appsetting de l'appli
-		ValidAudience = builder.Configuration["JWT:Audience"],
-		IssuerSigningKey = new SymmetricSecurityKey(macle)			// pour une mutuelle validation entre client et serveur.
-	};																// (Key) qui est dans l'appsetting et (macle) qui est en base de registre
-});
+builder.Services.AddScoped<IJWTManagerRepository, JWTManagerRepository>();
+builder.Services.AddScoped<ArmoiresContenuRepository>();
+builder.Services.AddScoped<ArmoireRepository>();
+builder.Services.AddScoped<MedecinRepository>();
+builder.Services.AddScoped<MedicamentRepository>();
+builder.Services.AddScoped<MedicamentsPrescritRepository>();
+builder.Services.AddScoped<OrdonnanceRepository>();
+builder.Services.AddScoped<PersonneRepository>();
+builder.Services.AddScoped<PharmacieRepository>();
+builder.Services.AddScoped<RoleRepository>();
 
-builder.Services.AddSingleton<IJWTManagerRepository, JWTManagerRepository>();
+builder.Services.AddDbContext<BDPMContext>(o => o.UseSqlServer(builder.Configuration.GetConnectionString("GestPharmaWorks")));
 
- 
+builder.Services.AddIdentity<PersonneEntity, RoleEntity>(
+                options => {
+                    options.SignIn.RequireConfirmedAccount = false;
+                    options.Password.RequireDigit = true;
+                    options.Password.RequireLowercase = true;
+                    options.Password.RequireUppercase = true;
+                    options.Password.RequiredLength = 5;
+                    options.Password.RequiredUniqueChars = 1;
+                })
+                .AddRoles<RoleEntity>()
+                .AddEntityFrameworkStores<BDPMContext>()
+                .AddDefaultTokenProviders();
 
 // Add services to the container.
 builder.Services.AddControllers();
 
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "GestPharma", Version = "v1" });
 
+    OpenApiSecurityScheme securitySchema = new()
+    {
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        Reference = new OpenApiReference
+        {
+            Type = ReferenceType.SecurityScheme,
+            Id = "Bearer"
+        }
+    };
+    c.AddSecurityDefinition("Bearer", securitySchema);
+    var securityRequirement = new OpenApiSecurityRequirement
+    {
+        { securitySchema, new[] { "Bearer" } }
+    };
+    c.AddSecurityRequirement(securityRequirement);
+});
 
 WebApplication app = builder.Build();
 
@@ -87,7 +85,8 @@ app.UseHttpsRedirection();
 
 app.UseCors("corsRoute");
 
-app.UseAuthentication();
+//app.UseAuthentication();
+app.UseMiddleware<JwtMiddleware>();
 
 app.UseAuthorization();
 

@@ -1,4 +1,5 @@
 ﻿using GestPharmaEF.DAL.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace GestPharmaEF.DAL
     {

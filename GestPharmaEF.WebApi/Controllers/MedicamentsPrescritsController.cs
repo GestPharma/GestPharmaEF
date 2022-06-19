@@ -1,84 +1,90 @@
 ﻿using GestPharmaEF.DAL.Repositories;
 using GestPharmaEF.Models.Concretes;
-using GestPharmaEF.WebApi.JWT_Authentication.JWTWebAuthentication.Repository;
+using GestPharmaEF.WebApi.Filters;
 using GestPharmaEF.WebApi.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.ObjectModel;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace GestPharmaEF.WebApi.Controllers
 {
-    [Authorize]
+    [Authorization]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     public class MedicamentsPrescritsController : ControllerBase
     {
-        private readonly IJWTManagerRepository _jWTManager;
+        private readonly MedicamentsPrescritRepository _medicamentsPrescritsRepository;
 
-        public MedicamentsPrescritsController(IJWTManagerRepository jWTManager)
+        public MedicamentsPrescritsController(MedicamentsPrescritRepository medicamentsPrescritsRepository)
         {
-            this._jWTManager = jWTManager;
+            _medicamentsPrescritsRepository = medicamentsPrescritsRepository;
         }
 
         // GET: api/<MedicamentsPrescritsController>
         [HttpGet]
-        [Authorize(Roles = "Admin, Praticien, Patient")]
-        public IEnumerable<MedicamentsPrescrits> Get()
-{
-            MedicamentsPrescritRepository medicamentsPrescritsRepository = new();
-            return new ObservableCollection<MedicamentsPrescrits>(medicamentsPrescritsRepository.GetAll()).ToList();
+        [Authorization("Admin", "Praticien", "Patient")]
+        public IEnumerable<MedicamentsPrescrits> GetAll()
+        {
+
+            return new ObservableCollection<MedicamentsPrescrits>(_medicamentsPrescritsRepository.GetAll()).ToList();
+        }
+        // GET: api/<MedecinsController>
+        [HttpGet]
+        [Authorization("Admin", "Praticien", "Patient")]
+        public IEnumerable<MedicamentsPrescrits> GetPage([FromQuery] int limit = 20, [FromQuery] int offset = 0)
+        {
+            return new ObservableCollection<MedicamentsPrescrits>(_medicamentsPrescritsRepository.GetAll(limit, offset)).ToList();
         }
 
         // GET api/<MedicamentsPrescritsController>/5
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin, Praticien")]
-        public MedicamentsPrescrits Get(long id)
+        [Authorization("Admin", "Praticien", "Patient")]
+        public IEnumerable<MedicamentsPrescrits> GetOne([FromQuery] long id)
         {
-            MedicamentsPrescritRepository medicamentsPrescritsRepository = new();
-            return medicamentsPrescritsRepository.GetOne(id);
+            IEnumerable<MedicamentsPrescrits> aa = _medicamentsPrescritsRepository.GetOne2(id);
+            foreach (var item in aa) { _ = item; };
+            return aa.AsEnumerable();
         }
 
         // POST api/<MedicamentsPrescritsController>
         [HttpPost]
-        [Authorize(Roles = "Admin, Praticien")]
-        public void Post([FromBody] J_MedicamentsPrescrits newMedicamentsPrescrits)
+        [Authorization("Admin", "Praticien")]
+        public void Post([FromQuery] J_MedicamentsPrescrits newMedicamentsPrescrits)
         {
             MedicamentsPrescrits medicamentsPrescrits = new(
                         newMedicamentsPrescrits.MPMedicamentId,
                         newMedicamentsPrescrits.MPOrdonnanceId,
                         newMedicamentsPrescrits.MPQuantite,
                         newMedicamentsPrescrits.MPPrise
-                        );
-            medicamentsPrescrits.MPMedicamentId = 0;
-            MedicamentsPrescritRepository medicamentsPrescritsRepository = new();
-            medicamentsPrescritsRepository.Add(medicamentsPrescrits);
+                        )
+            {
+                MPMedicamentId = 0
+            };
+            _medicamentsPrescritsRepository.Add(medicamentsPrescrits);
         }
 
         // PUT api/<MedicamentsPrescritsController>/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin, Praticien")]
-        public void Put(long id, [FromBody] J_MedicamentsPrescrits majMedicamentsPrescrits)
+        [Authorization("Admin", "Praticien")]
+        public void Put(long id, [FromQuery] J_MedicamentsPrescrits majMedicamentsPrescrits)
         {
             MedicamentsPrescrits medicamentsPrescrits = new(
                         majMedicamentsPrescrits.MPMedicamentId,
                         majMedicamentsPrescrits.MPOrdonnanceId,
                         majMedicamentsPrescrits.MPQuantite,
                         majMedicamentsPrescrits.MPPrise
-                        );
-            medicamentsPrescrits.MPMedicamentId = id;
-            MedicamentsPrescritRepository medicamentsPrescritsRepository = new();
-            medicamentsPrescritsRepository.Update(medicamentsPrescrits);
+                        )
+            {
+                MPMedicamentId = id
+            };
+            _medicamentsPrescritsRepository.Update(medicamentsPrescrits);
         }
 
         // DELETE api/<MedicamentsPrescritsController>/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin, Praticien")]
+        [Authorization("Admin", "Praticien")]
         public void Delete(long id)
         {
-            MedicamentsPrescritRepository medicamentsPrescritsRepository = new();
-            medicamentsPrescritsRepository.Delete(id);
+            _medicamentsPrescritsRepository.Delete(id);
         }
     }
 }

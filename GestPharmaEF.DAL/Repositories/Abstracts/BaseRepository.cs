@@ -6,9 +6,9 @@ namespace GestPharmaEF.DAL.Repositories.Abstracts
         where T : class
     {
         protected readonly BDPMContext _db;
-        public BaseRepository()
+        public BaseRepository(BDPMContext context)
         {
-            _db = new BDPMContext();
+            _db = context;
         }
 
         public abstract T GetOne(long id);

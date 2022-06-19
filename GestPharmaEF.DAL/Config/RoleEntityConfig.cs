@@ -15,7 +15,7 @@ namespace GestPharmaEF.DAL.Config
            .IsClustered();
 
             builder.Property(e => e.Name)
-            .HasColumnType("String")
+            .HasColumnType("nvarchar(256)")
             .HasColumnName("Name")
             .IsRequired()
             .HasComment("TRIAL");

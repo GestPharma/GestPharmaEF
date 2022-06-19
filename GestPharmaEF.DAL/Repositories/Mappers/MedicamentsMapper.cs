@@ -7,8 +7,10 @@ namespace GestPharmaEF.DAL.Repositories.Mappers
         {
         public static Medicaments ToModel(this MedicamentEntity Entity)
             {
-            Medicaments Medicament = new(Entity.Id, Entity.Nom ?? "");
-            Medicament.MedicamentId = Entity.Id;
+            Medicaments Medicament = new(Entity.Id, Entity.Nom ?? "")
+            {
+                MedicamentId = Entity.Id
+            };
             return Medicament;
             }
 

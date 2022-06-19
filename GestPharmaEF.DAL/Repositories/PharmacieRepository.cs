@@ -9,9 +9,10 @@ namespace GestPharmaEF.DAL.Repositories
     {
     public class PharmacieRepository : BaseRepository<Pharmacies>, IPharmacieRepository
         {
-        public PharmacieRepository() : base()
-            {
-            }
+        public PharmacieRepository(BDPMContext context) : base(context)
+        {
+        }
+
         public override bool Add(Pharmacies Pharmacie)
             {
             PharmacyEntity toInsert = Pharmacie.ToEntity();
@@ -43,6 +44,10 @@ namespace GestPharmaEF.DAL.Repositories
 
                 }
             }
+        public IEnumerable<Pharmacies> GetAll(int limit, int offset)
+        {
+            return _db.Pharmacies.Skip(offset).Take(limit).Select(m => m.ToModel());
+        }
 
         public override IEnumerable<Pharmacies> GetAll()
             {
@@ -59,22 +64,22 @@ namespace GestPharmaEF.DAL.Repositories
         }
 
         public override bool Update(Pharmacies Pharmacie)
-            {
-            // PharmacyEntity Ph = _db.Pharmacies.Find(Pharmacie.PharmacieId)!;
+        {
+            PharmacyEntity toUpdate = _db.Pharmacies.Find(Pharmacie.PharmacieId)!;
+            toUpdate.Id = Pharmacie.PharmacieId;
+            _db.Pharmacies.Remove(_db.Pharmacies.Find(Pharmacie.PharmacieId)!);
+            toUpdate = Pharmacie.ToEntity();
+            _db.Pharmacies.Add(toUpdate);
+
             try
-                {
-                PharmacyEntity Ph = PharmacieMapper.ToEntity(Pharmacie);
-                if (_db.Entry<PharmacyEntity>(Ph).State == EntityState.Detached)
-                    {
-                    _db.Entry<PharmacyEntity>(Ph).State = EntityState.Modified;
-                    }
+            {
                 _db.SaveChanges();
                 return true;
-                }
+            }
             catch (DbUpdateException)
-                {
+            {
                 return false;
-                }
             }
         }
     }
+}

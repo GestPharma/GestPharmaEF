@@ -9,9 +9,9 @@ namespace GestPharmaEF.DAL.Repositories
     {
     public class OrdonnanceRepository : BaseRepository<Ordonnances>, IOrdonnanceRepository
         {
-        public OrdonnanceRepository() : base()
-            {
-            }
+        public OrdonnanceRepository(BDPMContext context) : base(context)
+        {
+        }
 
         public override Ordonnances GetOne(long id)
             {
@@ -25,6 +25,10 @@ namespace GestPharmaEF.DAL.Repositories
             {
             return _db.Ordonnances.Select(m => m.ToModel());
             }
+        public IEnumerable<Ordonnances> GetAll(int limit, int offset)
+        {
+            return _db.Ordonnances.Skip(offset).Take(limit).Select(m => m.ToModel());
+        }
 
         public override bool Add(Ordonnances Ordonnance)
             {
@@ -44,23 +48,23 @@ namespace GestPharmaEF.DAL.Repositories
             }
 
         public override bool Update(Ordonnances Ordonnance)
-            {
-            // OrdonnanceEntity Me = _db.Ordonnances.Find(Ordonnance.OrdonnanceId)!;
+        {
+            OrdonnanceEntity toUpdate = _db.Ordonnances.Find(Ordonnance.OrdonnanceId)!;
+            toUpdate.Id = Ordonnance.OrdonnanceId;
+            _db.Ordonnances.Remove(_db.Ordonnances.Find(Ordonnance.OrdonnanceId)!);
+            toUpdate = Ordonnance.ToEntity();
+            _db.Ordonnances.Add(toUpdate);
+
             try
-                {
-                OrdonnanceEntity Me = OrdonnanceMappers.ToEntity(Ordonnance);
-                if (_db.Entry<OrdonnanceEntity>(Me).State == EntityState.Detached)
-                    {
-                    _db.Entry<OrdonnanceEntity>(Me).State = EntityState.Modified;
-                    }
+            {
                 _db.SaveChanges();
                 return true;
-                }
-            catch (DbUpdateException)
-                {
-                return false;
-                }
             }
+            catch (DbUpdateException)
+            {
+                return false;
+            }
+        }
 
         public override bool Delete(long id)
             {

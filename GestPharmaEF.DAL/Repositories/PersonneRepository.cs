@@ -9,9 +9,10 @@ namespace GestPharmaEF.DAL.Repositories
 {
     public class PersonneRepository : BaseRepository<Personnes>, IPersonneRepository
     {
-        public PersonneRepository() : base()
+        public PersonneRepository(BDPMContext context) : base(context)
         {
         }
+
         public override Personnes GetOne(long id)
         {
             return _db.Personnes.Find(id)!.ToModel();
@@ -26,10 +27,7 @@ namespace GestPharmaEF.DAL.Repositories
         }
         public override bool Add(Personnes Personne)
         {
-            RoleRepository rR = new();
             PersonneEntity toInsert = Personne.ToEntity();
-            toInsert.Roles = new();
-            toInsert.Roles = rR.GetOne(toInsert.CurrentRoleId ?? 2).ToEntity();
             _db.Personnes.Add(toInsert);
             try
             {
@@ -44,14 +42,13 @@ namespace GestPharmaEF.DAL.Repositories
         }
         public override bool Update(Personnes Personne)
         {
-            // PersonneEntity Me = _db.Personnes.Find(Personne.PersonneId)!;
+            PersonneEntity toUpdate = _db.Personnes.Find(Personne.Id)!;
+            toUpdate.Id = Personne.Id;
+            _db.Personnes.Remove(_db.Personnes.Find(Personne.Id)!);
+            toUpdate = Personne.ToEntity();
+            _db.Personnes.Add(toUpdate);
             try
             {
-                PersonneEntity Me = PersonneMappers.ToEntity(Personne);
-                if (_db.Entry<PersonneEntity>(Me).State == EntityState.Detached)
-                {
-                    _db.Entry<PersonneEntity>(Me).State = EntityState.Modified;
-                }
                 _db.SaveChanges();
                 return true;
             }
@@ -60,6 +57,7 @@ namespace GestPharmaEF.DAL.Repositories
                 return false;
             }
         }
+
         public override bool Delete(long id)
         {
             try
@@ -71,7 +69,6 @@ namespace GestPharmaEF.DAL.Repositories
             catch (DbUpdateException)
             {
                 return false;
-
             }
         }
 
@@ -80,7 +77,7 @@ namespace GestPharmaEF.DAL.Repositories
             // https://codepedia.info/jwt-authentication-in-aspnet-core-web-api-token
             foreach (Personnes pers in this.GetAll().ToList())
             {
-                if (pers.paswword == password && pers.email == email && pers.isactive) return true;
+                if (pers.Paswword == password && pers.Email == email && pers.Isactive) return true;
             }
             return false;
         }

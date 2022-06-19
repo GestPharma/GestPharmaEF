@@ -23,7 +23,7 @@ namespace EFCore_DBLibrary
         /// <summary>
         /// TRIAL
         /// </summary>
-        public string Patient { get; set; }
+        public long Patientid { get; set; }
 
         public virtual ICollection<ArmoiresStock> ArmoiresStocks { get; set; }
     }

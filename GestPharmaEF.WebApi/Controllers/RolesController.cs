@@ -1,75 +1,81 @@
 ﻿using GestPharmaEF.DAL.Repositories;
 using GestPharmaEF.Models.Concretes;
-using GestPharmaEF.WebApi.JWT_Authentication.JWTWebAuthentication.Repository;
+using GestPharmaEF.WebApi.Filters;
 using GestPharmaEF.WebApi.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.ObjectModel;
 
 namespace GestPharmaEF.WebApi.Controllers
 {
-    [Authorize]
+    [Authorization]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     public class RolesController : ControllerBase
     {
-        private readonly IJWTManagerRepository _jWTManager;
+        private readonly RoleRepository _roleRepository;
 
-        public RolesController(IJWTManagerRepository jWTManager)
+        public RolesController(RoleRepository roleRepository)
         {
-            this._jWTManager = jWTManager;
+            _roleRepository = roleRepository;
         }
         // GET: api/<RolesController>
         [HttpGet]
-        [Authorize(Roles = "Admin")]
-        public IEnumerable<Roles> Get()
+        [Authorization("Admin")]
+        public IEnumerable<Roles> GetAll()
         {
-            RoleRepository roleRepository = new();
-            return new ObservableCollection<Roles>(roleRepository.GetAll()).ToList();
+            return new ObservableCollection<Roles>(_roleRepository.GetAll()).ToList();
         }
-
+        // GET: api/<MedecinsController>
+        [HttpGet]
+        [Authorization("Admin")]
+        public IEnumerable<Roles> GetPage([FromQuery] int limit = 20, [FromQuery] int offset = 0)
+        {
+            return new ObservableCollection<Roles>(_roleRepository.GetAll(limit, offset)).ToList();
+        }
         // GET api/<RolesController>/5
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin")]
-        public Roles Get(long id)
+        [Authorization("Admin", "Praticien", "Patient")]
+        public IEnumerable<Roles> GetOne(long id)
         {
-            RoleRepository roleRepository = new();
-            return roleRepository.GetOne(id);
+            IEnumerable<Roles> aa = _roleRepository.GetOne2(id);
+            foreach (var item in aa) { _ = item; };
+            return aa.AsEnumerable();
         }
 
         // POST api/<RolesController>
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorization("Admin", "Praticien")]
         public void Post([FromBody] J_Roles newRole)
         {
             Roles role = new(
                         newRole.Name
-                        );
-            role.Id = 0;
-            RoleRepository roleRepository = new();
-            roleRepository.Add(role);
+                        )
+            {
+                Id = 0
+            };
+            _roleRepository.Add(role);
         }
 
         // PUT api/<RolesController>/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorization("Admin", "Praticien")]
         public void Put(long id, [FromBody] J_Roles majRole)
         {
             Roles role = new(
                         majRole.Name
-                        );
-            role.Id = id;
-            RoleRepository roleRepository = new();
-            roleRepository.Update(role);
+                        )
+            {
+                Id = id
+            };
+            _roleRepository.Update(role);
         }
 
         // DELETE api/<RolesController>/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorization("Admin", "Praticien")]
         public void Delete(long id)
         {
-            RoleRepository roleRepository = new();
-            roleRepository.Delete(id);
+            _roleRepository.Delete(id);
         }
     }
 }

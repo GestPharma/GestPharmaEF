@@ -20,10 +20,21 @@ namespace GestPharmaEF.DAL.Config
                 .HasComment("TRIAL");
 
             builder.Property(e => e.Nom)
-                .HasColumnType("text")
+                .HasColumnType("nvarchar(256)")
                 .HasColumnName("nom")
                 .IsRequired()
                 .HasComment("TRIAL");
-            }
+
+            builder.Property(e => e.Patientid)
+                    .HasColumnName("patientid")
+                    .IsRequired();
+
+
+            builder.HasOne(d => d.Patient)
+                .WithMany(p => p.Armoires)
+                .HasForeignKey(d => d.Patientid)
+                .HasConstraintName("FK_ArmoiresEntity_PersonnesEntity");
+
         }
     }
+}

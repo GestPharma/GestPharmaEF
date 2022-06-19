@@ -8,9 +8,10 @@ namespace GestPharmaEF.DAL.Repositories
 {
     public class RoleRepository : BaseRepository<Roles>, IRoleRepository
     {
-        public RoleRepository() : base()
+        public RoleRepository(BDPMContext context) : base(context)
         {
         }
+
         public override bool Add(Roles Role)
         {
             RoleEntity toInsert = Role.ToEntity();
@@ -39,13 +40,16 @@ namespace GestPharmaEF.DAL.Repositories
             catch (DbUpdateException)
             {
                 return false;
-
             }
         }
 
         public override IEnumerable<Roles> GetAll()
         {
             return _db.Roles.Select(m => m.ToModel());
+        }
+        public IEnumerable<Roles> GetAll(int limit, int offset)
+        {
+            return _db.Roles.Skip(offset).Take(limit).Select(m => m.ToModel());
         }
         public override Roles GetOne(long id)
         {
@@ -58,14 +62,14 @@ namespace GestPharmaEF.DAL.Repositories
 
         public override bool Update(Roles Role)
         {
-            // RoleEntity Ph = _db.Roles.Find(Role.RoleId)!;
+            RoleEntity toUpdate = _db.Roles.Find(Role.Id)!;
+            toUpdate.Id = Role.Id;
+            _db.Roles.Remove(_db.Roles.Find(Role.Id)!);
+            toUpdate = Role.ToEntity();
+            _db.Roles.Add(toUpdate);
+
             try
             {
-                RoleEntity Ph = RoleMapper.ToEntity(Role);
-                if (_db.Entry<RoleEntity>(Ph).State == EntityState.Detached)
-                {
-                    _db.Entry<RoleEntity>(Ph).State = EntityState.Modified;
-                }
                 _db.SaveChanges();
                 return true;
             }
@@ -74,7 +78,5 @@ namespace GestPharmaEF.DAL.Repositories
                 return false;
             }
         }
-
-
     }
 }

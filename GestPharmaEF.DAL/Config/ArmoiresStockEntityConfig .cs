@@ -27,7 +27,7 @@ namespace GestPharmaEF.DAL.Config
                     .HasComment("TRIAL");
 
                 builder.Property(e => e.Medicamentid)
-                    .HasColumnType("text")
+                    .HasColumnType("nvarchar(256)")
                     .HasColumnName("medicamentid")
                     .IsRequired()
                     .HasComment("TRIAL");
@@ -45,6 +45,7 @@ namespace GestPharmaEF.DAL.Config
                 builder.HasOne(d => d.Armoire)
                     .WithMany(p => p.ArmoiresStocks)
                     .HasForeignKey(d => d.Armoireid)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ArmoiresStockEntity_ArmoiresEntity");
 
                 builder.HasOne(d => d.Medi)

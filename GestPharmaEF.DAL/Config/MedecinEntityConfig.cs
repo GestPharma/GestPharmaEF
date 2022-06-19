@@ -20,49 +20,49 @@ namespace GestPharmaEF.DAL.Config
                     .HasComment("TRIAL");
 
                 builder.Property(e => e.Email)
-                    .HasColumnType("text")
+                    .HasColumnType("nvarchar(256)")
                     .HasColumnName("email")
                     .IsRequired()
                     .HasComment("TRIAL");
 
                 builder.Property(e => e.Fax)
-                    .HasColumnType("text")
+                    .HasColumnType("nvarchar(256)")
                     .HasColumnName("fax")
                     .IsRequired()
                     .HasComment("TRIAL");
 
                 builder.Property(e => e.Gsm)
-                    .HasColumnType("text")
+                    .HasColumnType("nvarchar(256)")
                     .HasColumnName("gsm")
                     .IsRequired()
                     .HasComment("TRIAL");
 
                 builder.Property(e => e.Inami)
-                    .HasColumnType("text")
+                    .HasColumnType("nvarchar(256)")
                     .HasColumnName("inami")
                     .IsRequired()
                     .HasComment("TRIAL");
 
                 builder.Property(e => e.Nom)
-                    .HasColumnType("text")
+                    .HasColumnType("nvarchar(256)")
                     .HasColumnName("nom")
                     .IsRequired()
                     .HasComment("TRIAL");
 
                 builder.Property(e => e.Rue)
-                    .HasColumnType("text")
+                    .HasColumnType("nvarchar(256)")
                     .HasColumnName("rue")
                     .IsRequired()
                     .HasComment("TRIAL");
 
                 builder.Property(e => e.Telephone)
-                    .HasColumnType("text")
+                    .HasColumnType("nvarchar(256)")
                     .HasColumnName("telephone")
                     .IsRequired()
                     .HasComment("TRIAL");
 
                 builder.Property(e => e.Ville)
-                    .HasColumnType("text")
+                    .HasColumnType("nvarchar(256)")
                     .HasColumnName("ville")
                     .IsRequired()
                     .HasComment("TRIAL");

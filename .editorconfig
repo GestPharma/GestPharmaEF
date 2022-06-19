@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# CA1827: N'utilisez pas Count() ou LongCount() quand Any() peut être utilisé
+dotnet_diagnostic.CA1827.severity = none

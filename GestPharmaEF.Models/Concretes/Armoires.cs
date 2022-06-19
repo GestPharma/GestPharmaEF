@@ -6,7 +6,7 @@ namespace GestPharmaEF.Models.Concretes
     /// </summary>
     public class Armoires : IArmoires
         {
-        public Armoires(long Armo_ID, string Armo_Name, string Armo_Patient)
+        public Armoires(long Armo_ID, string Armo_Name, long Armo_Patient)
             {
             ArmoID = Armo_ID;
             ArmoName = Armo_Name;
@@ -14,6 +14,6 @@ namespace GestPharmaEF.Models.Concretes
             }
         public long ArmoID { get; set; } = long.MinValue;
         public string ArmoName { get; set; } = string.Empty;
-        public string ArmoPatient { get; set; } = string.Empty;
+        public long ArmoPatient { get; set; } = long.MinValue;
     }
     }

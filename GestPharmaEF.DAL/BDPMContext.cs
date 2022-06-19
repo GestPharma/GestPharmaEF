@@ -1,30 +1,32 @@
-﻿using GestPharmaEF.DAL.Config;
+﻿// EntityFrameworkCore\Add-Migration MyFirstMigration
+// EntityFrameworkCore\update-database
+
+using GestPharmaEF.DAL.Config;
 using GestPharmaEF.DAL.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace GestPharmaEF.DAL
 {
     public partial class BDPMContext : IdentityDbContext<PersonneEntity, RoleEntity, long>
     {
-        public BDPMContext()
-        {
-            Armoires = Set<ArmoireEntity>();
-            ArmoiresStocks = Set<ArmoiresStockEntity>();
-            Medecins = Set<MedecinEntity>();
-            Medicaments = Set<MedicamentEntity>();
-            MedicamentsPrescrits = Set<MedicamentsPrescritEntity>();
-            Ordonnances = Set<OrdonnanceEntity>();
-            Pharmacies = Set<PharmacyEntity>();
-            Personnes = Set<PersonneEntity>();
-            Roles = Set<RoleEntity>();
-        }
+        //public BDPMContext()
+        //{
+        //    Armoires = Set<ArmoireEntity>();
+        //    ArmoiresStocks = Set<ArmoiresStockEntity>();
+        //    Medecins = Set<MedecinEntity>();
+        //    Medicaments = Set<MedicamentEntity>();
+        //    MedicamentsPrescrits = Set<MedicamentsPrescritEntity>();
+        //    Ordonnances = Set<OrdonnanceEntity>();
+        //    Pharmacies = Set<PharmacyEntity>();
+        //    Personnes = Set<PersonneEntity>();
+        //    Roles = Set<RoleEntity>();
+        //}
 
         public BDPMContext(DbContextOptions<BDPMContext> options)
             : base(options)
-            {
+        {
             Armoires = Set<ArmoireEntity>();
             ArmoiresStocks = Set<ArmoiresStockEntity>();
             Medecins = Set<MedecinEntity>();
@@ -34,12 +36,6 @@ namespace GestPharmaEF.DAL
             Pharmacies = Set<PharmacyEntity>();
             Personnes = Set<PersonneEntity>();
             Roles = Set<RoleEntity>();
-        }
-
-        public class Startup
-        {
-            public void ConfigureServices(IServiceCollection services)
-                => services.AddDbContext<BDPMContext>();
         }
 
         public virtual DbSet<ArmoireEntity> Armoires { get; set; }
@@ -49,7 +45,7 @@ namespace GestPharmaEF.DAL
         public virtual DbSet<MedicamentsPrescritEntity> MedicamentsPrescrits { get; set; }
         public virtual DbSet<OrdonnanceEntity> Ordonnances { get; set; }
         public virtual DbSet<PharmacyEntity> Pharmacies { get; set; }
-        public virtual DbSet<RoleEntity> Roles { get; set; }
+        public override DbSet<RoleEntity> Roles { get; set; }
         public virtual DbSet<PersonneEntity> Personnes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -58,30 +54,32 @@ namespace GestPharmaEF.DAL
             if (!optionsBuilder.IsConfigured)
             {
                 if (!optionsBuilder.IsConfigured)
-                    {
-                        string csbuilder = new ConfigurationBuilder()
-                        .SetBasePath(Directory.GetCurrentDirectory())
-                        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                        .Build().GetConnectionString("GestPharmaWorks").ToString();
+                {
+                    string csbuilder = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                    .Build().GetConnectionString("GestPharmaWorks").ToString();
 
-                        optionsBuilder.UseSqlServer(csbuilder);
-                    }
+                    optionsBuilder.UseSqlServer(csbuilder);
                 }
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new ArmoireEntityConfig());
-			modelBuilder.ApplyConfiguration(new ArmoiresStockEntityConfig());
-			modelBuilder.ApplyConfiguration(new MedecinEntityConfig());
-			modelBuilder.ApplyConfiguration(new MedicamentEntityConfig());
-			modelBuilder.ApplyConfiguration(new MedicamentsPrescritEntityConfig());
-			modelBuilder.ApplyConfiguration(new OrdonnanceEntityConfig());
-			modelBuilder.ApplyConfiguration(new PharmacyEntityConfig());
+            modelBuilder.ApplyConfiguration(new ArmoiresStockEntityConfig());
+            modelBuilder.ApplyConfiguration(new MedecinEntityConfig());
+            modelBuilder.ApplyConfiguration(new MedicamentEntityConfig());
+            modelBuilder.ApplyConfiguration(new MedicamentsPrescritEntityConfig());
+            modelBuilder.ApplyConfiguration(new OrdonnanceEntityConfig());
+            modelBuilder.ApplyConfiguration(new PharmacyEntityConfig());
             modelBuilder.ApplyConfiguration(new PersonneEntityConfig());
             modelBuilder.ApplyConfiguration(new RoleEntityConfig());
 
+
             OnModelCreatingPartial(modelBuilder);
+            base.OnModelCreating(modelBuilder);
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

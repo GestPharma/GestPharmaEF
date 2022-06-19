@@ -7,15 +7,17 @@ namespace GestPharmaEF.DAL.Repositories.Mappers
     {
         public static Medecins ToModel(this MedecinEntity Entity)
         {
-            Medecins Medecin = new (Entity.Nom??"",
-                                    Entity.Inami??"",
-                                    Entity.Rue??"",
-                                    Entity.Ville??"",
-                                    Entity.Telephone??"",
-                                    Entity.Gsm??"",
-                                    Entity.Fax??"",
-                                    Entity.Email??"");
-            Medecin.MedecinId=Entity.IdMedecin;
+            Medecins Medecin = new(Entity.Nom ?? "",
+                                    Entity.Inami ?? "",
+                                    Entity.Rue ?? "",
+                                    Entity.Ville ?? "",
+                                    Entity.Telephone ?? "",
+                                    Entity.Gsm ?? "",
+                                    Entity.Fax ?? "",
+                                    Entity.Email ?? "")
+            {
+                MedecinId = Entity.IdMedecin
+            };
             return Medecin;
         }
 

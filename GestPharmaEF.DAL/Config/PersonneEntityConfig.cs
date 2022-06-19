@@ -16,7 +16,7 @@ namespace GestPharmaEF.DAL.Config
            .IsClustered();
 
             builder.Property(e => e.Email)
-            .HasColumnType("String")
+            .HasColumnType("nvarchar(256)")
             .HasColumnName("email")
             .IsRequired()
             .HasComment("TRIAL");
@@ -28,7 +28,7 @@ namespace GestPharmaEF.DAL.Config
             .HasComment("TRIAL");
 
             builder.Property(e => e.ConnectAs)
-            .HasColumnType("String")
+            .HasColumnType("nvarchar(256)")
             .HasColumnName("connectAs")
             .IsRequired()
             .HasComment("TRIAL");
@@ -37,10 +37,22 @@ namespace GestPharmaEF.DAL.Config
                 .HasColumnName("currentroleid")
                 .HasComment("TRIAL");
 
-            builder.HasOne(d => d.Roles)
-            .WithMany(p => p.Personnes)
-            .HasForeignKey(d => d.CurrentRoleId)
-            .HasConstraintName("FK_Personne_Role_RoleId");
+            //builder.HasOne(d => d.Roles)
+            //.WithMany(p => p.Personnes)
+            //.HasForeignKey(d => d.CurrentRoleId)
+            //.HasConstraintName("FK_Personne_Role_RoleId");
+
+            builder.HasMany(u => u.Roles)
+                    .WithMany(r => r.Personnes)
+                    .UsingEntity<RoleEntity>(
+                        userRole => userRole.HasOne<RoleEntity>()
+                            .WithMany()
+                            .HasForeignKey(ur => ur.Id)
+                            .IsRequired(),
+                        userRole => userRole.HasOne<PersonneEntity>()
+                            .WithMany()
+                            .HasForeignKey(us => us.Id)
+                            .IsRequired());
 
             builder.HasIndex(x => x.Email).IsUnique();
         }
